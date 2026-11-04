@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Biblioteca UNCP · Catálogo</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: system-ui, sans-serif;
+      background: #f3f6f3;
+      color: #17332b;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+    }
+
+    header {
+      background: #123e30;
+      color: white;
+      padding: 2.2rem max(1rem, calc((100vw - 1100px) / 2));
+    }
+
+    header h1 {
+      margin: .2rem 0;
+      font-size: clamp(2rem, 5vw, 3rem);
+    }
+
+    header p {
+      max-width: 720px;
+      line-height: 1.5;
+      color: #d1e4da;
+    }
+
+    .etiqueta {
+      color: #ffda83;
+      text-transform: uppercase;
+      letter-spacing: .15em;
+      font-weight: 700;
+      font-size: .8rem;
+    }
+
+    main {
+      max-width: 1140px;
+      margin: auto;
+      padding: 1.4rem 1rem 3rem;
+    }
+
+    .rejilla {
+      display: grid;
+      grid-template-columns: minmax(280px, 1fr) minmax(330px, 1.4fr);
+      gap: 1.2rem;
+    }
+
+    .panel {
+      background: #fff;
+      border: 1px solid #d9e4dc;
+      border-radius: 14px;
+      padding: 1.4rem;
+      box-shadow: 0 6px 24px #17332b0b;
+      margin-bottom: 1.2rem;
+    }
+
+    h2 {
+      font-size: 1.25rem;
+      margin: 0 0 1rem;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      font-size: .9rem;
+      margin: .8rem 0 .3rem;
+    }
+
+    input,
+    select {
+      width: 100%;
+      font: inherit;
+      padding: .7rem;
+      border: 1px solid #9ab4a6;
+      border-radius: 7px;
+      background: white;
+      color: #17332b;
+    }
+
+    input:focus,
+    select:focus,
+    button:focus-visible {
+      outline: 3px solid #d1a748;
+      outline-offset: 2px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 7px;
+      font: inherit;
+      font-weight: 700;
+      padding: .72rem 1rem;
+      cursor: pointer;
+      background: #146548;
+      color: white;
+    }
+
+    button:hover {
+      background: #0d4934;
+    }
+
+    .secundario {
+      background: #e7efe9;
+      color: #154632;
+    }
+
+    .secundario:hover {
+      background: #d7e5da;
+    }
+
+    .fila {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .6rem;
+      margin-top: 1rem;
+    }
+
+    .fila input {
+      flex: 1 1 170px;
+    }
+
+    .fila button {
+      flex: 0 0 auto;
+    }
+
+    .dos {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .8rem;
+    }
+
+    .nota {
+      color: #4c6457;
+      font-size: .85rem;
+      line-height: 1.5;
+    }
+
+    #mensaje {
+      border-radius: 8px;
+      padding: .85rem 1rem;
+      margin-bottom: 1.2rem;
+      background: #e2f1e8;
+      color: #16442f;
+    }
+
+    #mensaje.error {
+      background: #fde9e5;
+      color: #812c23;
+    }
+
+    #mensaje[hidden],
+    [hidden] {
+      display: none !important;
+    }
+
+    .tabla {
+      overflow-x: auto;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      text-align: left;
+      font-size: .9rem;
+    }
+
+    th,
+    td {
+      padding: .7rem .5rem;
+      border-bottom: 1px solid #e0e8e1;
+      vertical-align: top;
+    }
+
+    th {
+      color: #456353;
+      white-space: nowrap;
+    }
+
+    .tipo {
+      display: inline-block;
+      background: #e4f1e9;
+      padding: .25rem .5rem;
+      border-radius: 5px;
+      font-size: .8rem;
+    }
+
+    #demo {
+      white-space: pre-line;
+      line-height: 1.7;
+      border-left: 4px solid #c49a38;
+      padding-left: .8rem;
+    }
+
+    footer {
+      color: #52685a;
+      text-align: center;
+      padding: 1rem;
+    }
+
+    @media (max-width: 790px) {
+      .rejilla {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="etiqueta">Práctica · Semana 10</div>
+    <h1>Biblioteca UNCP</h1>
+    <p>Catálogo de libros y equipos electrónicos. Esta interfaz funciona sin servidor;
+      los datos viven solo en esta pestaña y no se sincronizan con el programa Python.</p>
+  </header>
+  <main>
+    <div id="mensaje" role="status" aria-live="polite">Seleccione un tipo y registre su primer producto.</div>
+    <div class="rejilla">
+      <div>
+        <section class="panel" aria-labelledby="registro-titulo">
+          <h2 id="registro-titulo">Registrar producto</h2>
+          <form id="registro">
+            <label for="tipo">Tipo</label>
+            <select id="tipo">
+              <option value="Libro">Libro</option>
+              <option value="Electrónico">Equipo electrónico</option>
+            </select>
+            <div class="dos">
+              <div><label for="codigo">Código</label><input id="codigo" required placeholder="L-001"></div>
+              <div><label for="nombre">Nombre</label><input id="nombre" required placeholder="Python básico"></div>
+              <div><label for="precio">Precio base (S/)</label><input id="precio" required inputmode="decimal"
+                  placeholder="100.00"></div>
+              <div><label for="cantidad">Cantidad</label><input id="cantidad" required inputmode="numeric"
+                  placeholder="2"></div>
+            </div>
+            <div id="campos-libro" class="dos">
+              <div><label for="autor">Autor</label><input id="autor" placeholder="Autora UNCP"></div>
+              <div><label for="isbn">ISBN</label><input id="isbn" placeholder="978-0001"></div>
+            </div>
+            <div id="campos-equipo" class="dos" hidden>
+              <div><label for="marca">Marca</label><input id="marca" placeholder="Lenovo"></div>
+              <div><label for="garantia">Garantía (meses)</label><input id="garantia" inputmode="numeric"
+                  placeholder="12"></div>
+            </div>
+            <div class="fila"><button type="submit">Registrar</button></div>
+          </form>
+        </section>
+        <section class="panel" aria-labelledby="actualizar-titulo">
+          <h2 id="actualizar-titulo">Actualizar precio o cantidad</h2>
+          <form id="actualizar">
+            <label for="codigo-actualizar">Código existente</label>
+            <input id="codigo-actualizar" required placeholder="L-001">
+            <div class="dos">
+              <div><label for="campo-actualizar">Campo</label><select id="campo-actualizar">
+                  <option value="precio">Precio</option>
+                  <option value="cantidad">Cantidad</option>
+                </select></div>
+              <div><label for="valor-actualizar">Nuevo valor</label><input id="valor-actualizar" required
+                  inputmode="decimal" placeholder="50"></div>
+            </div>
+            <div class="fila"><button type="submit">Guardar cambio</button></div>
+          </form>
+        </section>
+      </div>
+      <div>
+        <section class="panel" aria-labelledby="catalogo-titulo">
+          <h2 id="catalogo-titulo">Catálogo <span id="contador">(0)</span></h2>
+          <form id="buscar" class="fila">
+            <input id="codigo-buscar" aria-label="Código a buscar" required placeholder="Buscar por código">
+            <button type="submit" class="secundario">Buscar</button>
+            <button type="button" id="mostrar-todos" class="secundario">Mostrar todos</button>
+          </form>
+          <div class="tabla">
+            <table>
+              <thead>
+                <tr>
+                  <th>Tipo y código</th>
+                  <th>Producto</th>
+                  <th>Precio base</th>
+                  <th>Cant.</th>
+                  <th>Precio final</th>
+                </tr>
+              </thead>
+              <tbody id="productos"></tbody>
+            </table>
+          </div>
+          <p id="vacio" class="nota">El catálogo está vacío.</p>
+          <p class="nota">Libro: 10 % de descuento · Electrónico: 15 % de recargo.
+            Son supuestos académicos, no tarifas oficiales.</p>
+        </section>
+        <section class="panel" aria-labelledby="demostracion-titulo">
+          <h2 id="demostracion-titulo">Demostración reproducible</h2>
+          <p class="nota">Ejecuta un caso exitoso y dos errores controlados en un catálogo separado.</p>
+          <button type="button" id="ejecutar-demo" class="secundario">Ejecutar demostración</button>
+          <p id="demo" aria-live="polite"></p>
+        </section>
+        <section class="panel" aria-labelledby="python-titulo">
+          <h2 id="python-titulo">También disponible en Python</h2>
+          <p class="nota">Para el menú CLI con clases, propiedades, herencia y excepciones,
+            ejecute <code>python3 main.py</code> desde la carpeta del proyecto.
+            Consulte <a href="README.md">README.md</a> para las instrucciones y pruebas.</p>
+        </section>
+      </div>
+    </div>
+  </main>
+  <footer>Biblioteca UNCP · Proyecto académico · Datos temporales en memoria</footer>
+  <script>
+    "use strict";
+    // Versión independiente de la CLI: no conecta con Python ni guarda archivos.
+    const catalogo = new Map();
+    const porId = (id) => document.getElementById(id);
+    const texto = (id, nombre) => {
+      const valor = porId(id).value.trim();
+      if (!valor) throw new Error(`${nombre} es obligatorio y no puede estar vacío.`);
+      return valor;
+    };
+    const codigo = (valor) => {
+      const limpio = valor.trim().toUpperCase();
+      if (!limpio) throw new Error("El código es obligatorio.");
+      return limpio;
+    };
+    const numero = (valor, nombre, entero = false) => {
+      const limpio = String(valor).trim();
+      const patron = entero ? /^\d+$/ : /^\d+(?:\.\d+)?$/;
+      if (!patron.test(limpio) || !Number.isFinite(Number(limpio)) ||
+        (entero && !Number.isSafeInteger(Number(limpio)))) {
+        throw new Error(`${nombre} debe ser ${entero ? "un entero" : "un número"} no negativo válido.`);
+      }
+      return Number(limpio);
+    };
+    const notificar = (mensaje, error = false) => {
+      porId("mensaje").textContent = mensaje;
+      porId("mensaje").classList.toggle("error", error);
+    };
+    const buscar = (datos, valor) => {
+      const clave = codigo(valor);
+      if (!datos.has(clave)) throw new Error(`NotFoundError: no existe un producto con código ${clave}.`);
+      return datos.get(clave);
+    };
+    const registrar = (datos, producto) => {
+      if (datos.has(producto.codigo)) throw new Error(`ValidationError: el código ${producto.codigo} ya está registrado.`);
+      datos.set(producto.codigo, producto);
+    };
+    const precioFinal = (producto) => producto.precio * (producto.tipo === "Libro" ? .90 : 1.15);
+    const dinero = (importe) => `S/ ${importe.toFixed(2)}`;
+    const celda = (fila, contenido) => {
+      const td = document.createElement("td");
+      td.textContent = contenido;
+      fila.append(td);
+    };
+    function mostrar(lista = [...catalogo.values()]) {
+      const cuerpo = porId("productos");
+      cuerpo.replaceChildren();
+      for (const producto of lista) {
+        const fila = document.createElement("tr");
+        celda(fila, `${producto.tipo} · ${producto.codigo}`);
+        celda(fila, `${producto.nombre} · ${producto.tipo === "Libro" ?
+          `${producto.autor} · ISBN ${producto.isbn}` :
+          `${producto.marca} · garantía ${producto.garantia} meses`}`);
+        celda(fila, dinero(producto.precio));
+        celda(fila, String(producto.cantidad));
+        celda(fila, dinero(precioFinal(producto)));
+        cuerpo.append(fila);
+      }
+      porId("contador").textContent = `(${catalogo.size})`;
+      porId("vacio").hidden = lista.length > 0;
+      porId("vacio").textContent = catalogo.size ? "No hay resultados para esta búsqueda." : "El catálogo está vacío.";
+    }
+    function controlar(accion) {
+      try { accion(); }
+      catch (error) { notificar(error.message, true); }
+    }
+    porId("tipo").addEventListener("change", () => {
+      const esLibro = porId("tipo").value === "Libro";
+      porId("campos-libro").hidden = !esLibro;
+      porId("campos-equipo").hidden = esLibro;
+    });
+    porId("registro").addEventListener("submit", (evento) => {
+      evento.preventDefault();
+      controlar(() => {
+        const tipo = porId("tipo").value;
+        const producto = {
+          tipo, codigo: codigo(texto("codigo", "El código")),
+          nombre: texto("nombre", "El nombre"),
+          precio: numero(porId("precio").value, "El precio"),
+          cantidad: numero(porId("cantidad").value, "La cantidad", true),
+        };
+        if (tipo === "Libro") {
+          producto.autor = texto("autor", "El autor");
+          producto.isbn = texto("isbn", "El ISBN");
+        } else {
+          producto.marca = texto("marca", "La marca");
+          producto.garantia = numero(porId("garantia").value, "La garantía", true);
+        }
+        registrar(catalogo, producto);
+        mostrar();
+        porId("registro").reset();
+        porId("tipo").dispatchEvent(new Event("change"));
+        notificar(`${tipo} ${producto.codigo} registrado correctamente.`);
+      });
+    });
+    porId("buscar").addEventListener("submit", (evento) => {
+      evento.preventDefault();
+      controlar(() => {
+        const producto = buscar(catalogo, porId("codigo-buscar").value);
+        mostrar([producto]);
+        notificar(`Encontrado: ${producto.tipo} ${producto.codigo}.`);
+      });
+    });
+    porId("mostrar-todos").addEventListener("click", () => { mostrar(); notificar("Catálogo completo."); });
+    porId("actualizar").addEventListener("submit", (evento) => {
+      evento.preventDefault();
+      controlar(() => {
+        const producto = buscar(catalogo, porId("codigo-actualizar").value);
+        const campo = porId("campo-actualizar").value;
+        const valor = numero(porId("valor-actualizar").value,
+          campo === "precio" ? "El precio" : "La cantidad", campo === "cantidad");
+        producto[campo] = valor;
+        mostrar();
+        notificar(`${producto.codigo}: ${campo} actualizado correctamente.`);
+      });
+    });
+    porId("ejecutar-demo").addEventListener("click", () => {
+      const ejemplo = new Map();
+      const libro = {
+        tipo: "Libro", codigo: "L-DEMO", nombre: "Python básico", precio: 100,
+        cantidad: 2, autor: "Autora UNCP", isbn: "978-0001"
+      };
+      const equipo = {
+        tipo: "Electrónico", codigo: "E-DEMO", nombre: "Lector digital", precio: 200,
+        cantidad: 1, marca: "Marca UNCP", garantia: 12
+      };
+      registrar(ejemplo, libro);
+      registrar(ejemplo, equipo);
+      const lineas = [`Éxito: ${libro.codigo} ${dinero(precioFinal(libro))}; ${equipo.codigo} ${dinero(precioFinal(equipo))}.`];
+      try { registrar(ejemplo, libro); }
+      catch (error) { lineas.push(error.message); }
+      try { buscar(ejemplo, "NO-EXISTE"); }
+      catch (error) { lineas.push(error.message); }
+      lineas.push("La interfaz sigue funcionando; el catálogo principal no cambió.");
+      porId("demo").textContent = lineas.join("\n");
+      notificar("Demostración completada en un catálogo separado.");
+    });
+    mostrar();
+  </script>
+</body>
+
+</html>

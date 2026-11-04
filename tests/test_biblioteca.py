@@ -47,6 +47,12 @@ class PruebasBiblioteca(unittest.TestCase):
                                             "Ada", "978-2"))
         self.assertEqual(self.biblioteca.buscar("L-1").nombre, "Python")
 
+    def test_codigo_no_cambia_tras_registro(self) -> None:
+        self.biblioteca.registrar(self.libro)
+        with self.assertRaises(ValidationError):
+            self.libro.codigo = "L-OTRO"
+        self.assertIs(self.biblioteca.buscar("L-1"), self.libro)
+
     def test_busqueda_y_actualizacion_inexistentes(self) -> None:
         with self.assertRaises(NotFoundError):
             self.biblioteca.buscar("NADA")

@@ -2,6 +2,7 @@
 
 from decimal import Decimal
 
+from utils.exceptions import ValidationError
 from utils.validators import (
     entero_no_negativo,
     normalizar_codigo,
@@ -26,7 +27,10 @@ class Producto:
 
     @codigo.setter
     def codigo(self, valor: str) -> None:
-        self._codigo = normalizar_codigo(valor)
+        codigo = normalizar_codigo(valor)
+        if hasattr(self, "_codigo") and codigo != self._codigo:
+            raise ValidationError("El código no puede cambiar después del registro.")
+        self._codigo = codigo
 
     @property
     def nombre(self) -> str:
