@@ -197,13 +197,6 @@
       font-size: .8rem;
     }
 
-    #demo {
-      white-space: pre-line;
-      line-height: 1.7;
-      border-left: 4px solid #c49a38;
-      padding-left: .8rem;
-    }
-
     footer {
       color: #52685a;
       text-align: center;
@@ -302,9 +295,31 @@
         </section>
         <section class="panel" aria-labelledby="demostracion-titulo">
           <h2 id="demostracion-titulo">Demostración reproducible</h2>
-          <p class="nota">Ejecuta un caso exitoso y dos errores controlados en un catálogo separado.</p>
+          <p class="nota">Ejecuta un caso exitoso y dos errores controlados en un catálogo separado. Los productos de abajo no se agregan al catálogo principal.</p>
           <button type="button" id="ejecutar-demo" class="secundario">Ejecutar demostración</button>
-          <p id="demo" aria-live="polite"></p>
+          <h3>Productos de demostración</h3>
+          <div class="tabla">
+            <table>
+              <thead>
+                <tr><th>Código</th><th>Producto</th><th>Precio base</th><th>Precio final</th><th>Resultado</th></tr>
+              </thead>
+              <tbody id="productos-demo"></tbody>
+            </table>
+          </div>
+          <p id="demo-vacio" class="nota">Ejecute la demostración para ver sus productos.</p>
+        </section>
+        <section class="panel" aria-labelledby="errores-titulo">
+          <h2 id="errores-titulo">Errores controlados</h2>
+          <p class="nota">Aquí se muestran por separado los errores de la demostración y los errores al usar el catálogo principal.</p>
+          <div class="tabla">
+            <table>
+              <thead>
+                <tr><th>Origen</th><th>Tipo</th><th>Detalle</th></tr>
+              </thead>
+              <tbody id="errores" aria-live="polite"></tbody>
+            </table>
+          </div>
+          <p id="errores-vacio" class="nota">Todavía no hay errores.</p>
         </section>
         <section class="panel" aria-labelledby="python-titulo">
           <h2 id="python-titulo">También disponible en Python</h2>
@@ -320,6 +335,8 @@
     "use strict";
     // Versión independiente de la CLI: no conecta con Python ni guarda archivos.
     const catalogo = new Map();
+    const erroresCatalogo = [];
+    let erroresDemo = [];
     const porId = (id) => document.getElementById(id);
     const texto = (id, nombre) => {
       const valor = porId(id).value.trim();
@@ -360,6 +377,23 @@
       td.textContent = contenido;
       fila.append(td);
     };
+    const datosError = (origen, error) => {
+      const tipo = error.message.startsWith("NotFoundError:") ? "NotFoundError" : "ValidationError";
+      return { origen, tipo, detalle: error.message.replace(/^(ValidationError|NotFoundError):\s*/, "") };
+    };
+    function mostrarErrores() {
+      const cuerpo = porId("errores");
+      cuerpo.replaceChildren();
+      const registros = [...erroresDemo, ...erroresCatalogo];
+      for (const error of registros) {
+        const fila = document.createElement("tr");
+        celda(fila, error.origen);
+        celda(fila, error.tipo);
+        celda(fila, error.detalle);
+        cuerpo.append(fila);
+      }
+      porId("errores-vacio").hidden = registros.length > 0;
+    }
     function mostrar(lista = [...catalogo.values()]) {
       const cuerpo = porId("productos");
       cuerpo.replaceChildren();
@@ -380,7 +414,11 @@
     }
     function controlar(accion) {
       try { accion(); }
-      catch (error) { notificar(error.message, true); }
+      catch (error) {
+        erroresCatalogo.push(datosError("Catálogo principal", error));
+        mostrarErrores();
+        notificar(error.message, true);
+      }
     }
     porId("tipo").addEventListener("change", () => {
       const esLibro = porId("tipo").value === "Libro";
@@ -444,16 +482,32 @@
       };
       registrar(ejemplo, libro);
       registrar(ejemplo, equipo);
-      const lineas = [`Éxito: ${libro.codigo} ${dinero(precioFinal(libro))}; ${equipo.codigo} ${dinero(precioFinal(equipo))}.`];
+      const cuerpo = porId("productos-demo");
+      cuerpo.replaceChildren();
+      for (const producto of ejemplo.values()) {
+        const fila = document.createElement("tr");
+        celda(fila, producto.codigo);
+        celda(fila, `${producto.tipo} · ${producto.nombre}`);
+        celda(fila, dinero(producto.precio));
+        celda(fila, dinero(precioFinal(producto)));
+        celda(fila, "Registro exitoso");
+        cuerpo.append(fila);
+      }
+      porId("demo-vacio").hidden = true;
+      erroresDemo = [];
       try { registrar(ejemplo, libro); }
-      catch (error) { lineas.push(error.message); }
+      catch (error) { erroresDemo.push(datosError("Demostración", error)); }
       try { buscar(ejemplo, "NO-EXISTE"); }
-      catch (error) { lineas.push(error.message); }
-      lineas.push("La interfaz sigue funcionando; el catálogo principal no cambió.");
-      porId("demo").textContent = lineas.join("\n");
-      notificar("Demostración completada en un catálogo separado.");
+      catch (error) { erroresDemo.push(datosError("Demostración", error)); }
+      mostrarErrores();
+      notificar("Demostración completada: dos productos y dos errores en sus tablas; el catálogo principal no cambió.");
     });
     mostrar();
+    mostrarErrores();
+    // Un enlace directo permite reproducir la demostración al abrir la página.
+    if (new URLSearchParams(window.location.search).has("demo")) {
+      porId("ejecutar-demo").click();
+    }
   </script>
 </body>
 

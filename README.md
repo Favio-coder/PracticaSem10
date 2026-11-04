@@ -40,7 +40,8 @@ Sem10/
 │   └── validators.py
 ├── tests/
 │   ├── __init__.py
-│   └── test_biblioteca.py
+│   ├── test_biblioteca.py
+│   └── test_interfaz.js      # Prueba opcional de la interfaz con Node
 ├── Capturas/               # Capturas de ejecuciones y navegador reales
 ├── README.md
 └── requirements.txt
@@ -52,7 +53,7 @@ El menú permite: **1** registrar libros, **2** registrar equipos electrónicos,
 
 Ejemplo: seleccione `1`, complete `L-1`, `Python básico`, `100`, `2`, `Autora UNCP`, `978-0001`; seleccione `2` y complete `E-1`, `Lector digital`, `200`, `1`, `Marca UNCP`, `12`. `3` muestra ambos objetos, `4` permite encontrar `l-1` y `6` muestra `S/ 90.00` y `S/ 230.00`. Con `5` puede modificar un precio o una cantidad; `7` crea su **propio catálogo temporal**, muestra un éxito, un duplicado y una búsqueda inexistente sin alterar los registros de la sesión. Los precios son valores académicos de demostración, no tarifas oficiales.
 
-La página permite registrar ambos tipos, mostrar todos, buscar, modificar precio o cantidad y ejecutar una demostración aislada. Sus avisos se muestran en la misma página; no hay persistencia ni sincronización con la CLI.
+La página permite registrar ambos tipos, mostrar todos, buscar, modificar precio o cantidad y ejecutar una demostración aislada. Los dos productos de ejemplo se muestran en una **tabla exclusiva de la demostración**, sin insertarse en el catálogo principal. Otra tabla reúne los errores controlados, identificando su origen como **Demostración** o **Catálogo principal** (duplicados, búsquedas fallidas y entradas incorrectas). Pulsar de nuevo el botón reemplaza las filas de la demostración y conserva los errores reales del catálogo principal. Para abrir la página con la demostración ya ejecutada, abra `index.html?demo=1`. Los avisos se muestran en la misma página; no hay persistencia ni sincronización con la CLI.
 
 ## Diagrama de clases (implementación Python)
 
@@ -151,9 +152,10 @@ Estas capturas proceden de terminales que ejecutaron comandos reales y de Firefo
 | Polimorfismo, demostración y MRO | ![Polimorfismo y MRO](Capturas/08_polimorfismo_y_mro.png) |
 | Pruebas finales | ![Verificación final](Capturas/09_verificacion_final.png) |
 | Página HTML en Firefox | ![Interfaz HTML real](Capturas/10_interfaz_html.png) |
+| Tablas de la demostración y errores en Firefox | ![Tablas de demostración y errores](Capturas/11_tablas_demo_y_errores.png) |
 
 ## Verificación y limitaciones
 
-Se ejecutaron 17 pruebas `unittest` que abarcan importaciones, herencia, alta de ambos tipos, listado, búsqueda, duplicados, validaciones, inmutabilidad del código, actualizaciones, polimorfismo, MRO, inicio/salida y continuidad tras errores desde `python3 main.py`. Se comprobó la sintaxis JavaScript con `node --check`, se probaron sus eventos de registro, búsqueda, duplicado, actualización y demostración en un entorno de prueba de DOM, y se renderizó `index.html` con Firefox. Node se utilizó **solo para verificar** el JavaScript: no es necesario para usar ninguna de las dos interfaces.
+Se ejecutaron 17 pruebas `unittest` que abarcan importaciones, herencia, alta de ambos tipos, listado, búsqueda, duplicados, validaciones, inmutabilidad del código, actualizaciones, polimorfismo, MRO, inicio/salida y continuidad tras errores desde `python3 main.py`. `node tests/test_interfaz.js` verifica los eventos JavaScript de registro, búsqueda, actualización, tablas de demostración/errores y repetición del ejemplo en un DOM de prueba; la página se renderizó con Firefox. Node se utilizó **solo para verificar** el JavaScript: no es necesario para usar ninguna de las dos interfaces.
 
 Limitaciones: los datos no persisten; tampoco se comparten entre CLI y navegador; el ISBN solo se valida como texto obligatorio, no se comprueban dígitos de control; los precios de pantalla se muestran con dos decimales pero no se imponen dos decimales a las entradas; la versión de navegador utiliza `Number` de JavaScript, mientras Python usa `Decimal`. No hay servidor ni permisos de usuario; las reglas de precio son supuestos didácticos.
